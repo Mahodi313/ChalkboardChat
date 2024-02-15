@@ -1,4 +1,5 @@
 using ChalkboardChat.Data.Database;
+using ChalkboardChat.Data.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,10 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Add services to the container.
 builder.Services.AddRazorPages(
-//options =>
-//{
-//	options.Conventions.AuthorizeFolder("/Member");
-//}
+options =>
+{
+    options.Conventions.AuthorizeFolder("/Member");
+}
 );
 
 var appDbConnectionString = builder.Configuration.GetConnectionString("DbConnection");
@@ -19,6 +20,8 @@ var authDbConnectionString = builder.Configuration.GetConnectionString("AuthConn
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(authDbConnectionString));
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AuthDbContext>();
+
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 var app = builder.Build();
 

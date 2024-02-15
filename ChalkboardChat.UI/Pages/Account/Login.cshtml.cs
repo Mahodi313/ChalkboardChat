@@ -34,7 +34,7 @@ namespace ChalkboardChat.UI.Pages.Account
 
                 if (signInResult.Succeeded)
                 {
-                    return RedirectToPage("/Member/Posts");
+                    return RedirectToPage("/member/index");
                 }
             }
 
