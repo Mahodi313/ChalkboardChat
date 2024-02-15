@@ -1,4 +1,6 @@
+using ChalkboardChat.Data.Database;
 using ChalkboardChat.Data.Models;
+using ChalkboardChat.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -6,29 +8,50 @@ namespace ChalkboardChat.UI.Pages.Member
 {
     public class PostsModel : PageModel
     {
+        private readonly AppDbContext _Context;
+        public PostsModel(AppDbContext context)
+        {
+            _Context = context;
 
+
+        }
         public List<MessageModel> Messages { get; set; }
 
         [BindProperty]
-        public string NewMessage { get; set; }
+        public string? Message { get; set; }
 
-        public void OnGet()
+        [BindProperty]
+        public string? Username { get; set; }
+
+
+        public async Task OnGet()
+
         {
-            // Fetch existing messages from database or any other data source
+            MessageRepository message = new(_Context);
 
-            Messages = new List<MessageModel>
-            {
-                new MessageModel { Username = "John Doe", Message = "Hello, world!",  Date = DateTime.Now.AddDays(-1) },
-                new MessageModel { Username = "Jane Smith", Message = "This is a sample message.", Date = DateTime.Now }
-            };
+            Messages = await message.GetAllMessages();
+
+
+
         }
 
         public IActionResult OnPost()
         {
-            // Process the new message submission (save to database, etc.)
 
-            Messages.Insert(0, new MessageModel { Username = "Current User", Message = NewMessage, Date = DateTime.Now });
-            return RedirectToPage("/MessageBoard");
+            MessageModel model = new MessageModel
+            {
+                Username = Username,
+                Message = Message,
+                Date = DateTime.Now
+
+            };
+
+            MessageRepository message = new(_Context);
+
+            message.AddMessage(model);
+            message.SaveChange();
+
+            return RedirectToPage("/members/posts");
         }
 
 
