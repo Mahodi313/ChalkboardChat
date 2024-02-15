@@ -1,6 +1,7 @@
 using ChalkboardChat.Data.Database;
 using ChalkboardChat.Data.Models;
 using ChalkboardChat.Data.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,10 +10,12 @@ namespace ChalkboardChat.UI.Pages.Member
     public class PostsModel : PageModel
     {
         private readonly AppDbContext _Context;
-        public PostsModel(AppDbContext context)
+
+        private readonly UserManager<IdentityUser> _userManager;
+        public PostsModel(AppDbContext context, UserManager<IdentityUser> userManager)
         {
             _Context = context;
-
+            _userManager = userManager;
 
         }
         public List<MessageModel> Messages { get; set; }
@@ -27,6 +30,10 @@ namespace ChalkboardChat.UI.Pages.Member
         public async Task OnGet()
 
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            Username = currentUser?.UserName;
+
             MessageRepository message = new(_Context);
 
             Messages = await message.GetAllMessages();
@@ -35,27 +42,70 @@ namespace ChalkboardChat.UI.Pages.Member
 
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
 
             MessageModel model = new MessageModel
             {
-                Username = Username,
+                Date = DateTime.Now,
                 Message = Message,
-                Date = DateTime.Now
+                Username = Username,
+
+
 
             };
 
             MessageRepository message = new(_Context);
 
-            message.AddMessage(model);
-            message.SaveChange();
+            await message.AddMessage(model);
+            await message.SaveChange();
 
-            return RedirectToPage("/members/posts");
+            return RedirectToPage("/member/posts");
         }
 
 
 
     }
 }
+//public class PostsModel : PageModel
+//{
+//    private readonly AppDbContext _context;
+//    private readonly MessageRepository _messageRepository;
+
+//    public PostsModel(AppDbContext context, MessageRepository messageRepository)
+//    {
+//        _context = context;
+//        _messageRepository = messageRepository;
+//    }
+
+//    public List<MessageModel> Messages { get; set; }
+
+//    [BindProperty]
+//    public string Message { get; set; }
+
+//    [BindProperty]
+//    public string Username { get; set; }
+
+//    public async Task OnGetAsync()
+//    {
+//        Messages = await _messageRepository.GetAllMessages();
+//    }
+
+//    public async Task<IActionResult> OnPostAsync()
+//    {
+
+
+//        var model = new MessageModel
+//        {
+//            Username = Username,
+//            Message = Message,
+//            Date = DateTime.Now
+//        };
+
+//        await _messageRepository.AddMessage(model);
+//        await _context.SaveChangesAsync();
+
+//        return RedirectToPage("/members/posts");
+//    }
+//}
 
