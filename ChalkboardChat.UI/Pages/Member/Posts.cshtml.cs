@@ -12,11 +12,12 @@ namespace ChalkboardChat.UI.Pages.Member
         private readonly AppDbContext _Context;
 
         private readonly UserManager<IdentityUser> _userManager;
-        public PostsModel(AppDbContext context, UserManager<IdentityUser> userManager)
+        private readonly SignInManager<IdentityUser> _signInManager;
+        public PostsModel(AppDbContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _Context = context;
             _userManager = userManager;
-
+            _signInManager = signInManager;
         }
         public List<MessageModel> Messages { get; set; }
 
@@ -37,34 +38,33 @@ namespace ChalkboardChat.UI.Pages.Member
             MessageRepository message = new(_Context);
 
             Messages = await message.GetAllMessages();
-
-
-
         }
 
-        public async Task<IActionResult> OnPost()
+        public async Task<IActionResult> OnPostAsync(string action)
         {
-
-            MessageModel model = new MessageModel
+            if (action == "submit")
             {
-                Date = DateTime.Now,
-                Message = Message,
-                Username = Username,
+                MessageModel model = new MessageModel
+                {
+                    Date = DateTime.Now,
+                    Message = Message,
+                    Username = Username,
+                };
 
+                MessageRepository message = new(_Context);
 
+                await message.AddMessage(model);
+                await message.SaveChange();
 
-            };
-
-            MessageRepository message = new(_Context);
-
-            await message.AddMessage(model);
-            await message.SaveChange();
-
-            return RedirectToPage("/member/posts");
+                return RedirectToPage("/member/posts");
+            }
+            else if (action == "logout")
+            {
+                await _signInManager.SignOutAsync();
+                return RedirectToPage("/Index");
+            }
+            return Page();
         }
-
-
-
     }
 }
 //public class PostsModel : PageModel
