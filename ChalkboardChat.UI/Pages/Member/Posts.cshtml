@@ -13,7 +13,7 @@
                     <div class="card-body">
                         <!-- Form for posting a message -->
                     <form method="post">
-                        <button type="submit" class="btn btn-primary m-2">Logout</button>
+                        <button type="submit" class="btn btn-primary m-2" name="action" value="logout">Logout</button>
                         <!-- Hidden input for Username -->
                         <input type="hidden" asp-for="Username" />
 
@@ -21,7 +21,7 @@
                             <label for="Message">Message:</label>
                             <textarea   rows="4" class="form-control" asp-for="Message"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary m-2">Submit</button>
+                        <button type="submit" class="btn btn-primary m-2" name="action" value="submit">Submit</button>
                     </form>
 
 
@@ -36,8 +36,7 @@
                                         <small>@message.Date.ToShortDateString()</small>
                                     </div>
                                     <p class="mb-1">@message.Message</p>
-                                </div>                            
-                                
+                                </div>                                                           
                             }
                         </div>
                     </div>
