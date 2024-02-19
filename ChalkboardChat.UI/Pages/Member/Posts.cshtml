@@ -26,19 +26,23 @@
 
 
                         <!-- Display existing messages -->
-                        <div class="list-group">
-                            @foreach (var message in Model.Messages)
-                            {
-
+                    <div class="list-group">
+                        @foreach (var message in Model.Messages.OrderByDescending(m => m.Date))
+                        {
                             <div class="list-group-item @(message.Username == Model.Username ? "bg-warning" : "") ">
-                                    <div class="d-flex w-100 justify-content-between ">
-                                        <h5 class="mb-1">@message.Username</h5>
-                                        <small>@message.Date.ToShortDateString()</small>
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        <h5 class="mb-1">@message.Username - <small style="font-size: 10px;">@message.Date.ToShortDateString()</small></h5>
                                     </div>
-                                    <p class="mb-1">@message.Message</p>
-                                </div>                                                           
-                            }
-                        </div>
+                                    @if (message.Username == Model.Username)
+                                    <div class="text-center">
+                                        <button style="width: 60px; height: 30px; font-size: 9px; align-content: center;" class="btn btn-danger">Delete</button>
+                                    </div>
+                                </div>
+                                <p class="mb-1">@message.Message</p>
+                            </div>
+                        }
+                    </div>
                     </div>
                 </div>
             </div>
